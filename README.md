@@ -17,7 +17,7 @@ npm run serve
 npm install axios vue-axios
 ```
 
-#### Install axios
+#### Install moment
 ```
 npm install moment --save
 ```
