@@ -1,6 +1,46 @@
 <template>
   <div class="container">
-    <transaction-table></transaction-table>
+    <div class="table-list">
+        <h1>ตารางแสดงรายรับ-รายจ่าย</h1>
+        <div class="table-list">
+          <table class="table-transaction">
+              <thead>
+                  <tr>
+                      <th>วัน/เดือน/ปี</th>
+                      <th>รายการ</th>
+                      <th>รายรับ<th>
+                      <th>รายจ่าย</th>
+                      <td></td>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr></tr>
+                  <tr v-for="(list, index) in transactions" :key="index">
+                      <td>{{ list.date }}</td>
+                      <td>{{ list.list }}</td>
+                      <td>{{ list.income }} บาท</td>
+                      <td></td>
+                      <td>{{ list.expense }} บาท</td>
+                  </tr>
+              </tbody>
+              <tfoot>
+                  <tr></tr>
+                  <tr>
+                      <th>รวม</th>
+                      <td></td>
+                      <td>{{ this.total.totalIncome }} บาท</td>
+                      <td></td>
+                      <td>{{ this.total.totalExpense }} บาท</td>
+                  </tr>
+                  <tr>
+                      <td></td>
+                      <th> <br><br><br> คงเหลือ</th>
+                      <td> <br><br><br> {{ this.total.balance }} บาท</td>
+                  </tr>
+              </tfoot>
+          </table>
+        </div>
+    </div>
     <div class="create">
         <h1>บัญชีรายรับ-รายจ่าย</h1>
         <h2>เพิ่มรายการใหม่</h2>
@@ -29,13 +69,9 @@
 </template>
 
 <script>
-import TransactionTable from './TransactionTable.vue'
 import TransactionStore from '@/store/transaction'
 import moment from 'moment'
 export default {
-  components: {
-    TransactionTable 
-  },
   data() {
     return {
         transactions: [],
@@ -44,35 +80,60 @@ export default {
             list: '',
             income: 0,
             expense: 0,
+            // balance: 0,
+            // totalIncome: 0,
+            // totalExpense: 0
+        },
+        total: {
             balance: 0,
             totalIncome: 0,
             totalExpense: 0
         }
     }
   },
+  created() {
+    this.fetchTransaction() 
+  },
   methods: {
+    async fetchTransaction() {
+        await TransactionStore.dispatch('fetchTransaction')
+        this.transactions = TransactionStore.getters.transactions
+        this.updateTransaction()
+    },
+    addTransaction() {
+        let payload = {
+            date: moment(this.form.date).format('DD/MM/YYYY'),
+            list: this.form.list,
+            income: parseInt(this.form.income),
+            expense: parseInt(this.form.expense),
+        }
+        TransactionStore.dispatch('addTransaction', payload)
+        this.clearForm()
+        this.updateTransaction()
+    },
     clearForm() {
         this.form =  {
             date: '',
             list: '',
             income: 0,
             expense: 0,
+            // balance: 0,
+            // totalIncome: 0,
+            // totalExpense: 0
+        }
+    },
+    updateTransaction() {
+        this.total = {
             balance: 0,
             totalIncome: 0,
             totalExpense: 0
         }
-    },
-    addTransaction() {
-        let payload = {
-                date: moment(this.form.date).format('DD/MM/YYYY'),
-                list: this.form.list,
-                income: this.form.income,
-                expense: this.form.expense,
-                
-        }
-        TransactionStore.dispatch('addTransaction', payload)
-        this.clearForm()
-    },
+        this.transactions.forEach(transaction => {
+            this.total.totalIncome += transaction.income
+            this.total.totalExpense += transaction.expense
+        })
+        this.total.balance = this.total.totalIncome - this.total.totalExpense
+    }
   }
 }
 </script>
