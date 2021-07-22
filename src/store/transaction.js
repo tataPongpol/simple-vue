@@ -25,34 +25,6 @@ export default new Vuex.Store({
   },
   actions: {
     async fetchTransaction({ commit }) {
-        // let res = {
-        //     data: [
-        //         {
-        //             date: '22/07/2021',
-        //             list: 'ได้รับเงิน',
-        //             income: 500,
-        //             expense: 0
-        //         },
-        //         {
-        //             date: '22/07/2021',
-        //             list: 'จ่ายค่าขนม',
-        //             income: 0,
-        //             expense: 20
-        //         },
-        //         {
-        //             date: '23/07/2021',
-        //             list: 'ได้รับเงิน',
-        //             income: 100,
-        //             expense: 0
-        //         },
-        //         {
-        //             date: '23/07/2021',
-        //             list: 'จ่ายค่าอุปกรณ์การเรียน',
-        //             income: 0,
-        //             expense: 300
-        //         },
-        //     ]
-        // }
         let res = await axios.get(api_data)
         commit('fetch', { res })
     },
